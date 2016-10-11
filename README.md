@@ -9,6 +9,8 @@ This repository is structured by semester and by course. Some courses are more a
 
 Courses:
 
+ - Statistical Methods
+
  - Probability
  
  - Inference
