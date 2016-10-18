@@ -844,6 +844,7 @@ mu10k <- replicate(10000, sum(runif(12))-6)
 
 
 #Testes
+# install.packages("ADGofTest", dependencies = TRUE)
 require(GLDEX); require(ADGofTest)
 ##KS
 ks.gof(mu10, "pnorm")
