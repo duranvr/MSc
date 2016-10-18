@@ -1,0 +1,1016 @@
+---
+title: "Anotações de Aulas"
+author: "Victor"
+date: "16 de agosto de 2016"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#MATF05 - Técnicas computacionais em estatística
+
+## Aula 1 - 16.08.2016
+
+Essa primeira aula trata de uma introdução ao R, apresentando as principais funções e funcionalidades do R.
+
+Tópicos:
+
+ - Sobre o R
+ - O R como calculadora
+ - Armazenando objetos no R
+ - Vetores
+ - Lendo os dados
+ - Baixando os dados
+ - Matrizes
+ - Análise descritiva: data.frames
+ - Importando dados: read.table
+ - Distribuição de probabilidade
+ - Criando funções
+ - Análises de frequência
+ - Testes t
+ - Testes F
+
+###Sobre o R
+
+Usado para análise manipilação de dados e realização e cálculos e visualização de gráficos.
+
+Presença de muitos pacotes, extensa comunidade estatistica.
+
+Software Livre e disponível para download
+
+### Instalação do R
+
+**R**
+
+https://cran.r-project.org/bin/windows/base/
+
+
+**RStudio**
+
+https://www.rstudio.com/products/rstudio/#Desktop
+
+###R como calculadora
+
+####Calculadora simples
+
+```{r}
+
+#Somar
+1+1
+
+#Subtrair
+14-6
+
+#Multiplicar
+3*4
+
+#Dividir
+47/11
+
+#Exponenciar
+2^5
+
+```
+
+
+####Calculadora científica
+
+```{r}
+
+#Trigonométricas
+sin(pi)
+cos(pi)
+
+#Outras
+sqrt(9)
+abs(-10)
+exp(1)
+log10(100)
+log(2.78)
+```
+
+###Armazenando valores no R
+
+' <- ' ou ' = '
+
+```{r}
+
+resultado <- 47/11
+
+resultado
+
+#É possível operar com valores armazenados no objeto
+sin(resultado)
+
+#Distinção entre maiúsculas e minúsculas 
+
+```
+
+**Obs1**.: O R utiliza, por *default*, o ponto '.' como separador de casas decimais.
+
+**Obs2**.: A seta para cima, do console, recupera os comandos antigos
+
+**Obs3**.: Usar Ctrl + l para limpar o console
+
+###Vetores
+
+Usar a função c() para concatenar os elementos em um vetor
+
+```{r}
+#c()
+x <- c(1, 2, 3, 4, 5)
+x
+
+# ':' cria uma sequência
+x <-  1:5
+x
+
+#Vetores não precisam ser numéricos (strings)
+x <- c('Rio', "São Paulo", "Salvador")
+x
+
+#Booleans
+x <- c(TRUE, FALSE, FALSE, T)
+x
+
+```
+
+
+####Indexação de vetores
+
+Utiliza-se o operador '[]' para selecionar objetos específicos em posições específicas de um vetor.
+
+Usamos alguns vetores já programados originalmente no R (letters, LETTERS, month.name)
+
+```{r}
+
+#Letras do alfabeto
+letters[1:6]
+
+LETTERS[c(4, 5, 6)]
+
+month.name[6:12]
+
+```
+
+
+Podemos utilizar também operações lógicas para selecionar elementos do vetor, buscando os valores condicionalmente.
+
+
+```{r}
+
+x <- c(0, 3, 3, 5, 1, 1:5, 12)
+
+x[x > 3]
+
+x[x != 3]
+
+#Podemos calcular o número de elementos de um vetor usando a função length()
+length(x[x>3])
+
+```
+
+####Operações com vetores
+
+Por default, o R opera em vetores de forma element-wise.
+
+```{r}
+
+x <- 1:5
+y <- 6:10
+
+#Soma
+x+y
+
+#Multiplicação
+x*y
+
+#Divisão
+x/y
+
+```
+
+### Lendo os dados
+
+####Manualmente
+
+É possível criar um vetor usando as funções scan() e edit(). Para alterar os dados em y, basta usar a função fix().
+
+Para efeito do markdown, não há como rodar essas funções
+
+```{r}
+
+# y <- scan()
+# y <- edit(data.frame())
+# fix(y)
+```
+
+**Obs**.: Diversos bancos de dados estão disponíveis em https://archive.ics.uci.edu/ml/datasets.html
+
+####De um arquivo diretamente
+
+A função read.table() pode ser utilizada para ler bancos de dados 
+
+```{r}
+
+df <- read.table("c:/Users/duranvr/Google Drive/UFBA/2016.2/Métodos Computacionais/dados/iris.txt", header = TRUE, sep = ",")
+
+```
+
+####Criando variáveis usando um banco conhecido
+
+```{r}
+
+Nomes <- c("João", "Maria", "Roberto", "Bruna", "Dolores", "Daniel", "Vinicius", "Alexandre")
+Peso <- c(70, 42, 91, 56, 58, 72, 81, 98)
+Altura <- c(1.65, 1.61, 1.89, 1.71, 1.68, 1.75, 1.69, 1.88)
+
+dados <- data.frame(Nomes, Peso, Altura)
+
+```
+
+Vamos criar uma variável BMI, que é dada pela fórmula 
+
+$$BMI=\frac{Peso,(Altura^2)}$$
+
+```{r}
+
+#Criando a variávle IMC
+dados$BMI <- dados$Peso/((dados$Altura)^2)
+
+```
+
+Agora vamos criar uma variável do tipo fator que categoriza o peso de cada indivíduo
+
+```{r}
+#Criando um vetor vazio
+dados$categoria <- NA
+
+#Preenchendo condicionalmente
+dados$categoria[dados$BMI < 20] <- "Abaixo"
+dados$categoria[dados$BMI <= 25 & dados$BMI >= 20] <- "Normal"
+dados$categoria[dados$BMI > 25] <- "Acima"
+
+#Utilizando a função ifelse()
+system.time(dados$categoria <- ifelse(dados$BMI < 20, "Abaixo", ifelse(dados$BMI <= 25, "Normal", "Acima")))
+
+#Utilizando os condicionais de programação
+for(i in 1:length(dados$categoria)){
+  dados$categoria[i] <- if(dados$BMI[i] < 20){
+    "Abaixo"
+  } else if(dados$BMI[i] <= 25){
+    "Normal"
+  } else {
+    "Acima"
+  }
+}
+
+
+```
+
+####Matrizes
+
+Lembramos que a matriz apenas comporta elementos com a mesma classe. 
+
+Primeiramente criamos a matriz apenas com os dados. Para substituir a apresentação genérica por uma nomeada, usamos a função dimnames(), que recebe como valor uma lista com um vetor para cada dimensão e cada vetor com um elemento para cada nível da dimensão
+
+```{r}
+
+#Gerando os dados
+dados2 <- matrix(c(12, 23, 19, 43, 11, 25, 35, 65, 32, 24, 26, 24),
+                nrow = 3, ncol = 4, byrow = TRUE)
+
+#Nomeando as dimensões
+dimnames(dados2) <- list(c("João", "Pedro", "Maria"),
+                        c("Exame1", "Exame2", "Exame3", "Exame4"))
+
+```
+
+
+Para indexar em uma matriz, precisamos lembrar que ela possui duas dimensões. Utilizamos o operador colchete mesmo, só que dessa vez com dois argumentos. Nesse formato:
+
+matriz['linhas','colunas']
+
+```{r}
+
+#Exibir todos os dados que se encontram na coluna 1
+dados2[,1] 
+
+#Exibir o primeiro elemento da primeira linha
+dados2[1,1]
+```
+
+
+Operações com matrizes
+
+
+```{r}
+
+mat1 <- matrix(rep(1, 6), 2, 3)
+mat2 <- matrix(rep(2, 6), 2, 3)
+
+#Soma de elementos da matriz
+mat1+mat2
+
+
+#Produtos de matrizes elemento a elemento
+mat1 * mat2
+
+#Para fazer multiplicação de matrizes, precisamos usar outro operador e transpor uma das matrizes
+mat1 %*% t(mat2)
+
+```
+
+
+### Estatística básica
+
+####Descritivas básicas
+
+Usando a função summary() em todo o banco
+
+```{r}
+
+summary(dados)
+
+```
+
+####Correlação e covariância
+
+```{r}
+grupo1 <- rnorm(100)
+grupo2 <- rnorm(100)
+grupo3 <- rnorm(100)
+grupo4 <- rnorm(100)
+
+dados3 <- data.frame(grupo1, grupo2, grupo3, grupo4)
+
+#Matriz de covariância
+cov(dados3)
+
+#Matriz de correlação
+cor(dados3)
+
+#Arredondando usando o round()
+round(cor(dados3), 3)
+```
+
+
+####Distribuição de frequência
+
+Todas as vantagens de um gráfico
+
+```{r}
+
+barplot(dados2[,4:1], beside = TRUE, col = 1:3, legend = rownames(dados2), ylim = c(0, 70), main = "Tempo de Reação")
+
+```
+
+
+####Boxplot
+
+```{r}
+
+boxplot(dados3, col = 2:5)
+
+```
+
+####Histogramas
+
+Vamos atentar para a estrutura dos gráficos usando o par(mfrow = )
+
+
+```{r}
+
+par(mfrow = c(2, 2))
+
+hist(dados3[,1], col = 2)
+hist(dados3[,2], col = 3)
+hist(dados3[,3], col = 4)
+hist(dados3[,4], col = 5)
+
+par(mfrow = c(1, 1))
+```
+
+####Gráficos de dispersão
+
+```{r}
+
+plot(dados3$grupo1, dados3$grupo2, col = 3, pch = 19)
+
+```
+
+Para gerar vários gráficos de dispersão ao mesmo tempo por pares de variáveis.
+
+```{r}
+
+pairs(dados3)
+
+```
+
+
+###Estatística inferencial
+
+####Análise de frequência - tabelas de contingência
+
+Gerando o banco
+
+```{r}
+
+cor <- c(rep("Preto", 32+55),
+         rep("Castanho", 43+65),
+         rep("Loiro", 16+64),
+         rep("Ruivo", 9+16))
+
+sexo <- c(rep("Masc", 32), rep("Fem", 55),
+          rep("Masc", 43), rep("Fem", 65),
+          rep("Masc", 16), rep("Fem", 64),
+          rep("Masc", 9), rep("Fem", 16))
+
+dadosCabelo <- data.frame(sexo, cor)
+
+chisq.test(table(dadosCabelo))
+
+```
+
+
+Observando as distribuições dos dados
+
+```{r}
+
+barplot(table(dadosCabelo), beside = TRUE, col = c(2, 3))
+legend("topright", c("Fem", "Masc"), fill = c(2, 3))
+
+```
+
+####Teste T para uma amostra
+
+```{r}
+
+set.seed(10)
+tempos <- rnorm(10, 45, 1)
+
+t.test(tempos, mu = 45, alternative = "greater")
+```
+
+####Teste T para duas amostras
+
+```{r}
+
+set.seed(10)
+dieta1 <- rnorm(10, 10, 2)
+dieta2 <- rnorm(8, 20, 2)
+
+boxplot(dieta1, dieta2, col = c(2, 4))
+
+t.test(dieta1, dieta2, alternative = "two.sided", var.equal = FALSE)
+
+```
+
+
+### Criando funções
+
+Para criar funções customizadas utilizamos a função 'function()'
+
+Vamos criar uma função que seleciona letras aleatórias.
+
+
+
+```{r}
+
+randomLetter <- function(n){
+  out <- sample(LETTERS, n, replace = TRUE)
+  return(out)
+}
+
+```
+
+Agora vamos criar uma função que seleciona n sequências de 10 números
+
+```{r}
+
+randomSeq <- function(n){
+  out <- matrix(NA, n, 10)
+  for(i in 1:n){
+    out[i,] <- sample(0:9, 10, replace = TRUE)
+  }
+  return(out)
+}
+
+randomSeq(2)
+
+```
+
+###Distribuições de probabilidade
+
+O R inclui algumas distribuições básicas em que a gente pode calcular:
+
+- d: densidade
+- p: probabilidade acumulada num ponto
+- q: o quantil em um determinado ponto
+- r: gera amostras da distribuição
+
+
+
+####Distribuição normal
+
+_norm()
+
+```{r}
+#Densidade no ponto 0
+dnorm(0)
+
+#usando a fórmula
+z <- 0
+myDens <- function(z, mu=0, sigma=1){
+  (1/sqrt(2*pi*sigma^2))*exp((-1/(2*sigma^2))*(z-mu)^2)
+}
+
+myDens(0)
+
+#Caso a normal não seja padrão
+dnorm(-1, 2, 3)
+myDens(-1, 2, 3)
+
+
+#Probabilidade acumulada no ponto 0
+pnorm(0)
+
+myProb <- function(x){
+  return(x)
+}
+
+#Quantil associado à probabilidade .975
+qnorm(.975)
+
+#Simula valores de uma normal 0, 1
+rnorm(10)
+
+#Para fixar a randomicidade da smilação set.seed()
+set.seed(1)
+rnorm(3)
+
+set.seed(1)
+rnorm(3)
+
+```
+
+Outras distribuições disponíveis: Binomial (binom), Uniforme (unif), Poisson (pois)
+
+
+##Aula 2 - 23.08.16
+
+###Geração de números (pseudo)aleatórios - Simulação estocástica
+
+O objetivo desse conteúdo é apresentar como obter números pseudoaleatórios para qualquer função densidade.
+
+Simular é imitar, reproduzir a realidade. Útil para estudos em que não há dados, ou estudos de recuperação de parâmetros para verificar qualidade de estimadores. Fortalece o argumento de artigos.
+
+Um computador digital não é capaz de gerar números aleatórios.
+
+Os sinais podem ser analógicos ou digitais, analógico é contínuo e digital é discreto.
+
+Bit é 0 ou 1, byte são 8 bits.
+
+Trabalharemos na geração de números pseudoaleatórios, um processo determinístico.
+
+John von Neumann (1951): "Anyone who considers arithmetical methods of producing random digits is of course in a state of sin."
+
+Geração de números verdadeiramente aleatórios tem como base processos físicos como ruído térmico, efeito fotoelétrico, decaimento radioativo.
+
+#### Geradores para a distribuição U[0,1]
+
+É a distribuição base da qual pode-se chegar às outras. O objetivo é gerar v.a's i.i.d. $U(0,1)$
+
+**Métodos**
+
+ - **Método congruencial** (linear misto - Lehumer, 1951):
+
+$$x_i=(ax_{i-1}+c)mod_m$$
+
+Onde a operação $mod_m$ opera divisão de inteiros do valor entre parêntesis por $m$ e retorna o resto; $a$, $c$ e $m$ são parãmetros fixos.
+
+Temos também um $x_0$ que é chamado de semente, ou raiz.
+
+Note que $0 \leq x_i \leq m-1$
+
+Quando $c=0$ temos o método congruencial linear multiplicativo.
+
+*Limitações*: Além do problema da geração ser discreta, pode haver também periodicidade da cadeia.
+
+Ex.: $x_{is}=157, 632, 1050, ..., 157, 632$
+
+Sendo o __período__ o número de iterações que uma sequência leva para se repetir. Desejamos períodos longos para minimizar "buracos".
+
+É importante então pensar em parâmetros $a$, $c$ e $m$ que encontre o maior período possível.
+
+Para obter os números entre 0 e 1 basta fazer $u_i= \frac{x_i}{m}$
+
+**Escolha dos parâmetros**
+
+$m$: Número próximo do número máximo da máquina (inteiro)
+
+$a$: Um valor alto qualquer exemplo, $7^5$
+
+Note que como excluimos o 0 e o m, o período máximo é m-1
+
+```{r}
+
+congruencial <- function(x0, a, c, m = 2^64 - 1, n=100){
+  n = n+1
+  out <- numeric(n)
+  out[1] <- x0
+  for(i in 2:n){
+    out[i] <- (a*out[i-1] + c)%%m
+  }
+  return(out[-1])
+}
+
+N <- 5
+checkPrimo <- function(N){
+  for(i in 2:(N-1)){
+  if((N)%%i == 0){
+    return(paste(N, "não é primo. É divisível por: ", i))
+    break
+  } else if(i == (N-1)){
+    return(paste(N, "é primo!"))
+  }
+}
+}
+
+
+checkPrimo2 <- function(N){
+  divs <- numeric(0)
+  
+  for(i in 2:(N-1)){
+    if((N)%%i == 0){
+      divs <- c(divs, i)
+    }
+  }
+  if(length(divs) > 0){
+    return(paste(N, "não é primo. É divisível por: ", paste(divs, collapse=", ")))
+  } else {
+    return(paste(N, "é primo!"))
+  }
+}
+
+checkPrimo2(12314)
+
+```
+
+#####Exemplo 2.1.
+
+Se $x_0=5$, $a=3$, $c=0$ e $m=150$, quais os 10 primeiros valores?
+
+Os valores observados são: `r congruencial(5, 3, 0, 150, 10)`
+
+Para obter os valores uniformes basta dividir por $m$. 
+
+`r congruencial(5, 3, 0, 150, 10)/150`
+
+Note que embora o período máximo seja 149, temos um período observado de 4. A sequência dos $x_{is}$ gerados é chamada de sequência de Lehmer.
+
+#####Exercício 2.1.
+
+Se $x_0=3$, $a=5$, $c=7$ e $m=200$, quais os 10 primeiros valores?
+
+Resp.: Valores: `r congruencial(3, 5, 7, 200, 10)`, na uniforme `r congruencial(3, 5, 7, 200, 10)/200`
+
+
+```{r}
+n <- 10000
+
+system.time(random <- congruencial(10, 21983, 239, 49187233, n)/49187233)
+# system.time(random <- runif(n))
+
+plot(random[1:(n-1)], random[2:n], pch = 19, cex = .1)
+
+```
+
+#### Aplicações
+
+ - Simulações
+ 
+ - Método de monte carlo
+ 
+ - Reamostragem
+
+**Obs**: a é dita "raíz primitiva" mod m se: 
+
+$$a^i \neq 1, i=1,2,..., m-2$$
+
+```{r}
+
+checkPrimRoot <- function(a, m){
+  for(i in 1:(m-2)){
+    if((a^i %% m) == 1){
+      return(paste(a, " NÃO é raiz primitiva de mod", m))
+    }
+  }
+  return(paste(a, "é raiz primitiva de mod", m))
+}
+
+
+checkPrimRoot(3, 31)
+
+which(congruencial(29138739218, 3, 0, 31, 100) == 26)
+
+congSmall <- congruencial(29138739218, 3, 0, 31, 10000)/(31)
+congLarge <- congruencial(32139, 7^5, 0, 2^31-1, 10000)/(2^31-1)
+
+#Autocorrelações
+acf(congSmall)
+acf(congLarge)
+
+#Média = .5
+mean(congSmall)
+mean(congLarge)
+
+#Variância = 1/12 = 0.08333
+var(congSmall)
+var(congLarge)
+
+#Até 10.000.000 vai ...
+length(table(congruencial(32139, 7^5, 0, 2^31-1, 1000)))
+
+```
+
+- Método * Linear Feedback Shift Register* (Tausworthe, 1965)
+
+$$a_k=(c_pa_{k-p}+c_{p-1}a_{k-p-1}+...+c_1a_{k-1}) mod_2$$
+
+Trata-se de um método binário, também possui problemas de periodicidade, o período máximo  é $2^{p-1}$, mas nada garante que seja. 
+
+### Distribuições univariadas
+
+- **Método da inversa da f.d.a. ou da transformação inversa**
+
+Método mais fácil e mais rápido de ser implementado. 
+
+Seja $X$ uma v.a. de forma que $F^{-1}_{X}(U)$, em que $F$ é uma f.d.a. inversível e $U$ v.a. com distribuição $U(0,1)$. Temos então que $X$ tem f.d.a. $F_X(x)$ e $U$ tem f.d.a. $F_U(u)$. Assim,
+
+$$F^{-1}_X(u)=inf{ x; F(x) \geq u}$$
+
+É a função de distribuição da v.a. gerada.
+
+$$P(X \leq x) = P(F^{-1}_{X}(U) \leq x) = $$
+$$=P(U \leq F_{X}(U)) = F_{X}(x)$$
+
+
+**VER!!** Prova do método da inversa (Casella?)
+
+**Exemplo**: Distribuição exponencial
+
+Gerar uma realização $X$ onde $X \sim Exp(\lambda)$
+
+$$u=F_x(x)=1-e^{-\lambda x}$$
+
+$$1-u=e^{-\lambda x}$$
+
+$$x= \frac{-log(1-u)}{\lambda}=F^{-1}_X(u)$$
+
+
+**Algoritmo**
+
+1 - Gerar $U \sim U(0,1)$
+
+2 - Calcular $X = \frac{-log(1-u)}{\lambda}=F^{-1}_X(u)$
+
+3 - Retornar $X$
+
+Com base nesse resultado eu posso gerar de várias distribuições que tem relação com exponencial, bastando obter apenas as outras inversas.
+
+**Exercícios**
+
+1 - Utilizar método da inversa da função de distribuição acumulada para gerar $X \sim U(a,b)$
+
+```{r}
+u <- runif(100000)
+
+a <- 3; b <- 5 #Alguns exemplos só pra testar
+x <- (b-a)*u + a #forma da inversa
+
+hist(x)
+
+```
+
+2 - Utilizar método da inversa da função de distribuição acumulada para gerar $X \sim Logistica(\mu, \beta)$
+
+$$F_X(x) = \frac{1}{1+ e^{ \frac{-(x- \mu)}{\beta}}}$$
+
+
+3 - Utilizar método da inversa da função de distribuição acumulada para gerar $X \sim Cauchy(\mu, \sigma)$
+
+$$F_X(x) = \frac{1}{2} + \frac{\tan^{-1}{\frac{x-\mu}{\sigma}}}{\pi}$$
+
+Outras distribuições que podem ser geradas pelo método da inversa:
+
+Beta(a, 1); Beta(1, b), Pareto(a, b), Weibull(a, b), etc...
+
+## Aula 4 - 30.08.2016
+
+### Métodos para geração de variáveis aleatórias com distribuições específicas
+
+#### Distribuição normal: $Z \sim N(0,1)$
+
+Caso queira outra média e variância, lembrar que, se $X=\sigma Z+\mu$, então $X \sim N(\mu, \sigma^2)$
+
+#####Média uniforme (método aproximado)
+
+Pelo TCL, sabemos que se $U_1, U_2, ...$ são v.a.'s iid $U(0,1)$, então:
+
+$$Z=\frac{\sum_{i=1}^N{U_i}-N/2}{\sqrt{N/12}}$$
+
+Então $Z$ tem distribuição aproximadamente normal ($N(0,1)$). Este processo nada mais é do que padronizar a soma das variáveis uniformes. 
+
+Tomando $N=12$, temos:
+
+$$Z=\sum_{i=1}^N{U_i}-6$$
+
+Recomenda-se a não utilização desse método por ser dependente de uma aproximação e não um método exato. 
+
+**Exercício**: Utilizando o gerador de uniformes do R, verifique a aproximação para $N=12$
+
+```{r}
+
+mu10 <- replicate(10, sum(runif(12))-6)
+
+mu100 <- replicate(100, sum(runif(12))-6)
+
+mu1k <- replicate(1000, sum(runif(12))-6)
+
+mu10k <- replicate(10000, sum(runif(12))-6)
+
+
+#Testes
+require(GLDEX); require(ADGofTest)
+##KS
+ks.gof(mu10, "pnorm")
+ks.gof(mu100, "pnorm")
+ks.gof(mu1k, "pnorm")
+ks.gof(mu10k, "pnorm")
+
+#AD
+ad.test(mu10, distr.fun = pnorm)
+ad.test(mu100, distr.fun = pnorm)
+ad.test(mu1k, distr.fun = pnorm)
+ad.test(mu10k, distr.fun = pnorm)
+
+#Shapiro-wilk
+shapiro.test(mu10)
+shapiro.test(mu100)
+shapiro.test(mu1k)
+# shapiro.test(mu10k) #Não roda
+
+#QQPlot
+par(mfrow = c(2, 2))
+qqnorm(mu10); qqline(mu10)
+qqnorm(mu100); qqline(mu100)
+qqnorm(mu1k); qqline(mu1k)
+qqnorm(mu10k); qqline(mu10k)
+
+
+#Histograma
+hist(mu10, col = "light blue")
+hist(mu100, col = "light blue")
+hist(mu1k, col = "light blue")
+hist(mu10k, col = "light blue")
+
+par(mfrow = c(1, 1))
+
+#Testando várias replicações
+mu10.1k <- replicate(1000, replicate(10, sum(runif(12))-6))
+pValues <- sapply(mu10.1k, function(x){
+  ks.gof(x, "pnorm")$p.value
+})
+
+mean(pValues<.05)
+
+```
+
+
+##### Método Box-Muller (1958)
+
+Baseado na geração inicial de duas $U(0, 1)$ que são submetidas à seguinte transformação:
+
+$$Z_1=\sqrt{-2\log{U_1}}\cos{2\pi U_2}$$
+
+$$Z_2=\sqrt{-2\log{U_1}}\sin{2\pi U_2}$$
+
+Assim, $Z_1$ e $Z_2 \sim N(0, 1)$ independentes
+
+Vantagem: é __exato__
+
+Desvantagem: mais __lento__
+
+A base desse algoritmo são coordenadas polares, pensando nas duas realizações da normal como pontos de um plano cartesiano, representando-os em coordenadas polares temos:
+
+$$R=\sqrt{X^2+Y^2}$$
+
+$$\theta=\arctan{Y/X}$$
+
+Como $X ,Y \sim N(0,1)$ independentes
+
+$$f(x,y)=\frac{1}{2\pi}e^{\frac{-1}{2}(x^2+y^2)}$$
+
+Aplicando a transformação usando jacobiano, temos que 
+
+$$f(r^2, \theta)= exp(1/2)*U(0, 2\pi)$$
+
+Onde o primeiro termo corresponde ao $R^2$ e o segundo ao $\theta$.
+
+Teremos pelo método da inversa que $R^2=-2\log(U_1)$ e $\theta=2\piU_2$. Assim é possível obter que $Y=R\sin{\theta}$ e $X=R\cos{\theta}$
+
+##### Método Polar (Marsaglia, 1962)
+
+Parte de $U_1$ e $U_2 \sim U(0, 1)$ independentes. 
+
+**Algoritmo:**
+
+1. Até que $V_1^2+V_2^2 <= 1$, repetir:
+
+    + Gerar $U_1$ e $U_2 \sim U(0, 1)$
+
+    + Calcular: $V_1=2U_1-1$ e $V_2=2U_2-1$
+
+2. Calcular:
+
+$$Z_1=V_1\sqrt{\frac{-2\log{(V_1^2+V_2^2)}}{V_1^2+V_2^2}}$$
+
+$$Z_2=V_2\sqrt{\frac{-2\log{(V_1^2+V_2^2)}}{V_1^2+V_2^2}}$$
+
+Trata-se de um algoritmo de aceitação/rejeição, com alta taxa de aceitação $\frac{\pi}{4} \approx 0.785$. Também fundamentado em coordenadas polares
+
+```{r}
+
+polar <- function(n){
+  out <- numeric()
+  for(i in 1:n){
+    v1=1
+    v2=2
+    while((v1^2+v2^2)>1){
+      v1=2*runif(1)-1
+      v2=2*runif(1)-1
+    }
+    a <- v1^2+v2^2
+    z1 <- v1*sqrt((-2*log(a))/(a))
+    z2 <- v2*sqrt((-2*log(a))/(a))
+    
+    out <- c(out, z1, z2)
+  }
+  return(out)
+}
+
+
+hist(polar(1000))
+  
+
+
+```
+
+
+#### Distribuição poisson: $Z \sim pois(\lambda)$
+
+[Ver caderno para detalhes]
+
+```{r}
+
+myPois <- function(l, n){
+  out <- numeric(n)
+  
+  for(i in 1:n){
+    y <- 0
+    k <- exp(-l)
+    p <- runif(1)
+    while(p>k){
+      u <- runif(1)
+      p <- u*p
+      y <- y+1
+    }
+    out[i] <- y
+  }
+  return(out)
+}
+
+
+pois <- myPois(3, 100000)
+
+ks.gof(pois, "ppois", lambda = 3)
+
+hist(pois)
+```
+
+
+##Aula 5 - 2016.09.06
+
+###Métodos de Rejeição
+
+Procurar: acceptance-rejection ou accept-reject ou reject method ou sampling
+
+####Método de rejeição básico
+
+Considere uma v.a. $X$ com f.d.p. proporcional a $g(x)$, ou seja, $g(x)=cf(x)$ onde $f(x)$ é a f.d.p. de $X$. 
+
+
+
