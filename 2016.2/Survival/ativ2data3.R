@@ -13,7 +13,7 @@ library(survival)
 library(flexsurv)
 
 hist(times)
-pdf("./2016.2/Survival/differentDists.pdf")
+# pdf("./2016.2/Survival/differentDists.pdf")
 par(mfrow = c(2, 3))
 #Exponential
 plot(flexsurvreg(Surv(times, cens)~1, dist = "exponential"), type = "survival",
@@ -79,15 +79,15 @@ dev.off()
 
 LAddWeibull <- function(theta){
     
-  a <- abs(theta[1])
-  b <- abs(theta[2])
-  c <- abs(theta[3])
-  d <- abs(theta[4])
+  # a <- abs(theta[1])
+  # b <- abs(theta[2])
+  # c <- abs(theta[3])
+  # d <- abs(theta[4])
   
-  # a <- theta[1]
-  # b <- theta[2]
-  # c <- theta[3]
-  # d <- theta[4]
+  a <- theta[1]
+  b <- theta[2]
+  c <- theta[3]
+  d <- theta[4]
   
   
   f <- exp(-(t/a)^b -(t/c)^d)*(b*(a^-b)*(t/a)^(b-1) + d*(c^-d)*(t/c)^(d-1))
@@ -101,7 +101,7 @@ t <- times
 
 LAddWeibull(runif(4, 0, 10))
 
-addWeiPars <- optim(par = runif(4), fn = LAddWeibull, method = "L-BFGS-B",
+addWeiPars <- optim(par = runif(4), fn = LAddWeibull, method = "SANN",
                     # lower = c(0, 0, 0, 0),
                     # upper = c(10, 10, 10, 10),
                     control = list(maxit = 50000))

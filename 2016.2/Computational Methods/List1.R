@@ -79,8 +79,32 @@ Q2 <- function(n = 100){
 result <- Q2(n = 132981)
 result$acceptRate
 
+#### Questão 03 ###
+#Método da inversa
+x <- (-1 + sqrt(1 + 8*runif(1000000)))/2
+hist(x)
+plot(density(x))
+
+#Método da aceitação-rejeição
+Q3Correto <- function(n){
+  va <- 0
+  count <- 0
+  while(count < n){
+    u <- runif(1)
+    x <- runif(1)
+    
+    if(u <= (x + 1/2)/(3/2)){
+      count <- count+1
+      va[count] = x
+    }
+  }
+  return(va)
+}
+
+hist(Q3(10000))
+
 #Modificação
-Q3 <- function(n = 100){
+Q3Mod <- function(n = 100){
   
   x1 <- function(t){
     return(2 + 2*sqrt(t))
@@ -103,7 +127,28 @@ summary(Q3(100000))
 hist(Q3(100000))
 
 
+#### Question 4 ####
 
+solution <- (exp(-.05)*(-1.05) + 1)/(1-exp(-.05))
+solution
+
+Q4 <- function(n){
+  count <- 0
+  out <- 0
+  while(count < n){
+    # x <- rexp(1, 1)
+    x <- log(1/runif(1))
+    if(x < .05){
+      count <- count + 1
+      out[count] <- x
+    }
+  }
+  return(mean(out))
+}
+
+Q4(10000)
+
+#### Question 5 ####
 
 f <- function(x){
   return(30*(x^2 - 2*x^3 + x^4))
@@ -113,7 +158,67 @@ x <- seq(0, 1, by = .00001)
 plot(x, f(x), type = "l")
 max(f(x))
 
-abline(h = 1.875)
-abline(h = 1, col = "red")
+Q5 <- function(n){
+  count <- 0
+  out <- 0
+  while(count < n){
+    u <- runif(1)
+    x <- runif(1)
+    # if(u < 1/1.875){
+    if(u < (f(x)/1.875)){
+      count <- count + 1
+      out[count] <- x
+    }
+  }
+  return(out)
+}
 
-1/1.875
+hist(Q5(10000), freq = FALSE)
+lines(x, f(x))
+
+
+#### Question 6 ####
+
+MCInt <- function(n, g){
+  u <- runif(n)
+  return(mean(g(u)))
+}
+
+#a)
+
+ga <- function(x){
+  exp(exp(x))
+}
+
+MCInt(100000, ga)
+integrate(ga, 0, 1)
+
+#b)
+gb <- function(x){
+  exp(x^2 + x)  
+}
+
+
+hb <- function(x){
+  4*(exp(x^2 + x))
+}
+
+mean(hb(runif(1000000, -2, 2)))
+
+integrate(gb, -2, 2)
+
+#c)
+
+gc <- function(x){
+  x*(1+x^2)^(-2)
+}
+
+integrate(gc, 0, Inf)
+
+hc <- function(x){
+  gc(x)/exp(-x)
+}
+
+mean(hc(rexp(100000)))
+
+#d)
